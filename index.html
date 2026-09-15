@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Content Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        accent: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-darkbg text-slate-100 font-sans min-h-screen flex flex-col selection:bg-accent selection:text-white">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Hero Section -->
+    <header class="min-h-screen flex flex-col justify-between p-6 md:p-12 relative border-b border-slate-800">
+        <!-- Top Stats Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-cardbg/50 backdrop-blur-md p-4 rounded-xl border border-slate-700/50 max-w-4xl mx-auto w-full">
+            <div class="flex items-center gap-2 text-sm text-slate-300">
+                <i class="fa-solid fa-cube text-accent"></i>
+                <span>Total Items: <strong id="stat-total" class="text-white">0</strong></span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-slate-300">
+                <i class="fa-solid fa-paperclip text-emerald-400"></i>
+                <span>With Files: <strong id="stat-files" class="text-white">0</strong></span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-slate-300">
+                <i class="fa-solid fa-shield-halved text-amber-400"></i>
+                <span class="text-emerald-400 font-mono font-semibold">ACCESS_COST: FREE</span>
+            </div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="text-center max-w-3xl mx-auto my-auto space-y-6">
+            <h1 id="hero-title" class="text-4xl md:text-6xl font-extrabold tracking-tight text-white outline-none focus:ring-2 focus:ring-accent rounded px-2" contenteditable="false">
+                Interactive Content Hub
+            </h1>
+            <p id="hero-desc" class="text-lg md:text-xl text-slate-400 outline-none focus:ring-2 focus:ring-accent rounded px-2" contenteditable="false">
+                Explore modules, documents, and rich media content. Securely managed and instantly accessible.
+            </p>
+            <div>
+                <a href="#modules-section" class="inline-flex items-center gap-2 bg-accent hover:bg-blue-600 text-white font-medium px-8 py-4 rounded-full transition-all shadow-lg hover:shadow-accent/50 group">
+                    <span>ENTER</span>
+                    <i class="fa-solid fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Hero Footer Spacer -->
+        <div class="h-10"></div>
+    </header>
+
+    <!-- Main Content / Modules Section -->
+    <main id="modules-section" class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+                <i class="fa-solid fa-layer-group text-accent"></i> MODULES
+            </h2>
+            <!-- Admin Add Button (Visible only in Admin Mode) -->
+            <button id="add-item-btn" onclick="openAddModal()" class="hidden items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium transition shadow">
+                <i class="fa-solid fa-plus"></i> + ADD_ITEM
+            </button>
+        </div>
+
+        <!-- Modules Grid -->
+        <div id="modules-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards injected here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 text-center py-6 text-sm text-slate-500">
+        <p>&copy; 2026 Interactive Hub. Hosted on GitHub Pages.</p>
+    </footer>
+
+    <!-- Admin Floating Button -->
+    <button onclick="handleAdminClick()" class="fixed bottom-6 right-6 z-40 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 p-4 rounded-full shadow-2xl flex items-center justify-center transition group" title="Admin Mode">
+        <i class="fa-solid fa-lock text-lg group-hover:scale-110 transition-transform" id="admin-icon"></i>
+    </button>
+
+    <!-- Modal: Item Detail View (Overlay) -->
+    <div id="detail-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-cardbg border border-slate-700 w-full max-w-3xl rounded-2xl p-6 md:p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div id="detail-content" class="space-y-6 mt-2">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Add Item (Admin) -->
+    <div id="add-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 w-full max-w-lg rounded-2xl p-6 md:p-8 relative shadow-2xl">
+            <button onclick="closeAddModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-folder-plus text-emerald-400"></i> Add New Module</h3>
+            <form id="add-form" onsubmit="handleAddItem(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Title *</label>
+                    <input type="text" id="item-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-accent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Description / Short Note *</label>
+                    <textarea id="item-desc" rows="3" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-accent"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Upload File (Optional, up to ~1GB)</label>
+                    <input type="file" id="item-file" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-blue-600 cursor-pointer">
+                    <p class="text-xs text-slate-500 mt-1">Supports images, videos, audio, PDFs, documents, etc.</p>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-lg transition shadow">Save Module</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Password Prompt -->
+    <div id="password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-cardbg border border-slate-700 w-full max-w-sm rounded-2xl p-6 relative shadow-2xl text-center">
+            <h3 id="pwd-modal-title" class="text-lg font-bold mb-2 text-white">Enter Admin Password</h3>
+            <p id="pwd-modal-desc" class="text-sm text-slate-400 mb-4">Please input your admin password.</p>
+            <form onsubmit="handlePasswordSubmit(event)" class="space-y-4">
+                <input type="password" id="password-input" required placeholder="Password..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-center focus:outline-none focus:border-accent">
+                <div class="flex gap-2">
+                    <button type="button" onclick="closePasswordModal()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-lg font-medium transition">Cancel</button>
+                    <button type="submit" class="flex-1 bg-accent hover:bg-blue-600 text-white py-2.5 rounded-lg font-medium transition">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Management
+        let isAdmin = false;
+        let items = JSON.parse(localStorage.getItem('hub_items')) || [];
+        let siteConfig = JSON.parse(localStorage.getItem('hub_config')) || {
+            title: "Interactive Content Hub",
+            desc: "Explore modules, documents, and rich media content. Securely managed and instantly accessible."
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderConfig();
+            renderItems();
+            updateStats();
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-blue-600';
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300`;
+            toast.innerHTML = `
+                <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i>
+                <span class="text-sm font-medium">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Render Header Config
+        function renderConfig() {
+            const titleEl = document.getElementById('hero-title');
+            const descEl = document.getElementById('hero-desc');
+            titleEl.innerText = siteConfig.title;
+            descEl.innerText = siteConfig.desc;
+        }
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('stat-total').innerText = items.length;
+            const withFiles = items.filter(i => i.fileData).length;
+            document.getElementById('stat-files').innerText = withFiles;
+        }
+
+        // Render Modules Grid
+        function renderItems() {
+            const grid = document.getElementById('modules-grid');
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                        <i class="fa-solid fa-box-open text-4xl mb-3"></i>
+                        <p>No modules available yet. Switch to admin mode to add one.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map((item, index) => `
+                <div class="bg-cardbg border border-slate-700/70 hover:border-accent/50 rounded-2xl p-6 flex flex-col justify-between transition-all group relative shadow-lg hover:shadow-accent/10">
+                    ${isAdmin ? `
+                        <button onclick="deleteItem(${index})" class="absolute top-4 right-4 bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white w-8 h-8 rounded-full flex items-center justify-center transition" title="Delete Module">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    ` : ''}
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center font-bold">
+                                #${index + 1}
+                            </div>
+                            ${item.fileData ? '<span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20"><i class="fa-solid fa-paperclip"></i> File Attached</span>' : ''}
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-accent transition-colors">${escapeHtml(item.title)}</h3>
+                        <p class="text-slate-400 text-sm line-clamp-3 mb-6">${escapeHtml(item.desc)}</p>
+                    </div>
+                    <button onclick="openDetailModal(${index})" class="w-full bg-slate-800 hover:bg-accent text-slate-200 hover:text-white font-medium py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+                        <span>OPEN</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Security / Password & Admin Logic
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        let pendingPasswordAction = null;
+
+        async function handleAdminClick() {
+            const storedHash = localStorage.getItem('hub_admin_pwd');
+            if (!storedHash) {
+                // First time setup
+                openPasswordSetupModal();
+            } else {
+                // Prompt for password
+                openPasswordVerifyModal();
+            }
+        }
+
+        function openPasswordSetupModal() {
+            document.getElementById('pwd-modal-title').innerText = "Set Admin Password";
+            document.getElementById('pwd-modal-desc').innerText = "Create a master password for managing content.";
+            document.getElementById('password-input').value = "";
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('password-modal').classList.add('flex');
+            pendingPasswordAction = 'setup';
+        }
+
+        function openPasswordVerifyModal() {
+            document.getElementById('pwd-modal-title').innerText = "Enter Admin Password";
+            document.getElementById('pwd-modal-desc').innerText = "Input password to toggle Admin mode.";
+            document.getElementById('password-input').value = "";
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('password-modal').classList.add('flex');
+            pendingPasswordAction = 'verify';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.remove('flex');
+            document.getElementById('password-modal').classList.add('hidden');
+        }
+
+        async function handlePasswordSubmit(e) {
+            e.preventDefault();
+            const val = document.getElementById('password-input').value;
+            const hash = await sha256(val);
+
+            if (pendingPasswordAction === 'setup') {
+                localStorage.setItem('hub_admin_pwd', hash);
+                closePasswordModal();
+                enableAdminMode();
+                showToast("Admin password successfully set!");
+            } else if (pendingPasswordAction === 'verify') {
+                const storedHash = localStorage.getItem('hub_admin_pwd');
+                if (hash === storedHash) {
+                    closePasswordModal();
+                    toggleAdminState();
+                } else {
+                    showToast("Incorrect password!", "error");
+                }
+            }
+        }
+
+        function toggleAdminState() {
+            isAdmin = !isAdmin;
+            const icon = document.getElementById('admin-icon');
+            const addBtn = document.getElementById('add-item-btn');
+            
+            if (isAdmin) {
+                icon.className = "fa-solid fa-unlock text-lg text-emerald-400 group-hover:scale-110 transition-transform";
+                addBtn.classList.remove('hidden');
+                addBtn.classList.add('flex');
+                // Make header editable
+                document.getElementById('hero-title').contentEditable = "true";
+                document.getElementById('hero-title').classList.add('border', 'border-accent/50', 'bg-slate-900/40');
+                document.getElementById('hero-desc').contentEditable = "true";
+                document.getElementById('hero-desc').classList.add('border', 'border-accent/50', 'bg-slate-900/40');
+                showToast("Admin mode activated!");
+            } else {
+                icon.className = "fa-solid fa-lock text-lg group-hover:scale-110 transition-transform";
+                addBtn.classList.remove('flex');
+                addBtn.classList.add('hidden');
+                // Disable header editable & save
+                document.getElementById('hero-title').contentEditable = "false";
+                document.getElementById('hero-title').classList.remove('border', 'border-accent/50', 'bg-slate-900/40');
+                document.getElementById('hero-desc').contentEditable = "false";
+                document.getElementById('hero-desc').classList.remove('border', 'border-accent/50', 'bg-slate-900/40');
+                
+                siteConfig.title = document.getElementById('hero-title').innerText;
+                siteConfig.desc = document.getElementById('hero-desc').innerText;
+                localStorage.setItem('hub_config', JSON.stringify(siteConfig));
+                showToast("Admin mode deactivated. Changes saved.");
+            }
+            renderItems();
+        }
+
+        function enableAdminMode() {
+            isAdmin = true;
+            const icon = document.getElementById('admin-icon');
+            const addBtn = document.getElementById('add-item-btn');
+            icon.className = "fa-solid fa-unlock text-lg text-emerald-400 group-hover:scale-110 transition-transform";
+            addBtn.classList.remove('hidden');
+            addBtn.classList.add('flex');
+            
+            document.getElementById('hero-title').contentEditable = "true";
+            document.getElementById('hero-title').classList.add('border', 'border-accent/50', 'bg-slate-900/40');
+            document.getElementById('hero-desc').contentEditable = "true";
+            document.getElementById('hero-desc').classList.add('border', 'border-accent/50', 'bg-slate-900/40');
+            renderItems();
+        }
+
+        // Add Item Flow
+        function openAddModal() {
+            document.getElementById('add-form').reset();
+            document.getElementById('add-modal').classList.remove('hidden');
+            document.getElementById('add-modal').classList.add('flex');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.remove('flex');
+            document.getElementById('add-modal').classList.add('hidden');
+        }
+
+        function handleAddItem(e) {
+            e.preventDefault();
+            const title = document.getElementById('item-title').value;
+            const desc = document.getElementById('item-desc').value;
+            const fileInput = document.getElementById('item-file');
+
+            const file = fileInput.files[0];
+            if (file && file.size > 1024 * 1024 * 1024) { // 1GB check
+                showToast("File size exceeds 1GB limit!", "error");
+                return;
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    const newItem = {
+                        title,
+                        desc,
+                        fileData: uploadEvent.target.result,
+                        fileName: file.name,
+                        fileType: file.type
+                    };
+                    items.push(newItem);
+                    saveAndRefresh();
+                    closeAddModal();
+                    showToast("Module added successfully with file!");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                const newItem = {
+                    title,
+                    desc,
+                    fileData: null,
+                    fileName: null,
+                    fileType: null
+                };
+                items.push(newItem);
+                saveAndRefresh();
+                closeAddModal();
+                showToast("Module added successfully!");
+            }
+        }
+
+        function deleteItem(index) {
+            if (confirm("Are you sure you want to delete this module?")) {
+                items.splice(index, 1);
+                saveAndRefresh();
+                showToast("Module deleted.", "info");
+            }
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('hub_items', JSON.stringify(items));
+            renderItems();
+            updateStats();
+        }
+
+        // Detail Modal View
+        function openDetailModal(index) {
+            const item = items[index];
+            const contentDiv = document.getElementById('detail-content');
+            
+            let fileHTML = '';
+            if (item.fileData) {
+                if (item.fileType.startsWith('image/')) {
+                    fileHTML = `<div class="mt-4 rounded-xl overflow-hidden border border-slate-700 bg-slate-900 flex justify-center"><img src="${item.fileData}" class="max-h-[60vh] object-contain"></div>`;
+                } else if (item.fileType.startsWith('video/')) {
+                    fileHTML = `<div class="mt-4 rounded-xl overflow-hidden border border-slate-700 bg-slate-900"><video controls class="w-full max-h-[60vh]"><source src="${item.fileData}" type="${item.fileType}">Your browser does not support video.</video></div>`;
+                } else if (item.fileType.startsWith('audio/')) {
+                    fileHTML = `<div class="mt-4 p-6 rounded-xl border border-slate-700 bg-slate-900 text-center"><audio controls class="w-full"><source src="${item.fileData}" type="${item.fileType}">Your browser does not support audio.</audio></div>`;
+                } else {
+                    fileHTML = `
+                        <div class="mt-4 p-4 rounded-xl border border-slate-700 bg-slate-900 flex items-center justify-between">
+                            <div class="flex items-center gap-3 truncate">
+                                <i class="fa-solid fa-file-arrow-down text-accent text-2xl"></i>
+                                <span class="text-sm font-medium text-slate-200 truncate">${escapeHtml(item.fileName)}</span>
+                            </div>
+                            <a href="${item.fileData}" download="${escapeHtml(item.fileName)}" class="bg-accent hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition shrink-0">Download File</a>
+                        </div>
+                    `;
+                }
+            }
+
+            contentDiv.innerHTML = `
+                <div class="space-y-4">
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-white">${escapeHtml(item.title)}</h2>
+                    <p class="text-slate-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(item.desc)}</p>
+                    ${fileHTML}
+                </div>
+            `;
+
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Utility to prevent XSS
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#039;');
+        }
+    </script>
+</body>
+</html>
