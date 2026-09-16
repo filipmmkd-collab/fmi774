@@ -507,7 +507,11 @@
                     </a>
                     <div class="p-5">
                         <h3 class="text-lg font-bold mb-1 group-hover:accent-text transition-colors">${escapeHtml(item.title)}</h3>
-                        <p class="muted-text text-sm line-clamp-2">${escapeHtml(item.desc)}</p>
+                        <p class="muted-text text-sm line-clamp-2 mb-2">${escapeHtml(item.desc)}</p>
+                        <div class="flex items-center gap-1.5 text-xs accent-text truncate">
+                            <i class="fa-solid fa-link shrink-0"></i>
+                            <span class="truncate">${escapeHtml(getDisplayUrl(item.link))}</span>
+                        </div>
                     </div>
                 </div>`;
             }).join('');
@@ -710,6 +714,10 @@
             document.getElementById('detail-content').innerHTML = `
                 <h2 class="text-2xl md:text-3xl font-extrabold text-white">${escapeHtml(item.title)}</h2>
                 <p class="muted-text leading-relaxed">${escapeHtml(item.desc)}</p>
+                <div class="flex items-center gap-2 accent-text text-sm font-medium">
+                    <i class="fa-solid fa-link"></i>
+                    <span>${escapeHtml(getDisplayUrl(item.link))}</span>
+                </div>
                 <a href="${escapeAttr(item.link)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-6 py-3 rounded-full transition">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link
                 </a>`;
@@ -834,6 +842,14 @@
         }, 500);
 
         // ===== Utils =====
+        function getDisplayUrl(url) {
+            if (!url) return '';
+            let u = url;
+            u = u.replace(/^https?:\/\//, '').replace(/^www\./, '');
+            if (u.length > 40) u = u.substring(0, 40) + '...';
+            return u;
+        }
+
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
