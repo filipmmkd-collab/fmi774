@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Content Hub</title>
+    <title>CREATED BY fmi774</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style id="dynamic-theme">
@@ -47,6 +47,23 @@
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
         .music-player { animation: slideUp 0.4s ease forwards; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .glow-text {
+            text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent), 0 0 40px var(--accent); }
+            50% { text-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent), 0 0 60px var(--accent); }
+        }
+        .glow-card { transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.4s ease; }
+        .glow-card:hover {
+            box-shadow: 0 0 20px var(--accent), 0 0 40px rgba(59,130,246,0.3);
+            transform: translateY(-4px);
+        }
+        .glow-btn {
+            box-shadow: 0 0 15px var(--accent), 0 0 30px rgba(59,130,246,0.4);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
     </style>
   <meta property="og:image" content="https://bolt.new/static/og_default.png">
     <meta name="twitter:card" content="summary_large_image">
@@ -133,14 +150,12 @@
     <!-- Hero Section -->
     <header id="hero-section" class="min-h-screen flex flex-col justify-center p-6 md:p-12 relative border-b border-themed">
         <div id="hero-content" class="text-center max-w-3xl mx-auto my-auto space-y-6">
-            <h1 id="hero-title" class="text-4xl md:text-6xl font-extrabold tracking-tight outline-none focus:ring-2 focus:ring-blue-500 rounded px-2" contenteditable="false">
-                Interactive Content Hub
+            <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold tracking-tight glow-text outline-none focus:ring-2 focus:ring-blue-500 rounded px-2" contenteditable="false">
+                CREATED BY fmi774
             </h1>
-            <p id="hero-desc" class="text-lg md:text-xl muted-text outline-none focus:ring-2 focus:ring-blue-500 rounded px-2" contenteditable="false">
-                Click any card to explore. Built for creators.
-            </p>
+            <p id="hero-desc" class="hidden" contenteditable="false"></p>
             <div>
-                <a href="#modules-section" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-8 py-4 rounded-full transition-all shadow-lg group">
+                <a href="#modules-section" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-8 py-4 rounded-full transition-all glow-btn group">
                     <span>ENTER</span>
                     <i class="fa-solid fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
                 </a>
@@ -152,7 +167,7 @@
     <main id="modules-section" class="flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full">
         <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
             <h2 class="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-3">
-                <i class="fa-solid fa-layer-group accent-text"></i> LINKS
+                <i class="fa-solid fa-layer-group accent-text"></i> MODULES
             </h2>
             <div class="flex items-center gap-3">
                 <button id="theme-btn" onclick="toggleThemePanel()" class="hidden items-center gap-2 border border-themed hover:accent-bg hover:text-white px-4 py-2 rounded-lg font-medium transition">
@@ -162,7 +177,7 @@
                     <i class="fa-solid fa-music"></i> Music
                 </button>
                 <button id="add-item-btn" onclick="openAddModal()" class="hidden items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium transition shadow">
-                    <i class="fa-solid fa-plus"></i> Add Link
+                    <i class="fa-solid fa-plus"></i> Add Module
                 </button>
             </div>
         </div>
@@ -216,7 +231,7 @@
             <button onclick="closeAddModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-link accent-text"></i> <span id="add-modal-title">Add Link Card</span></h3>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-link accent-text"></i> <span id="add-modal-title">Add Module</span></h3>
             <form id="add-form" onsubmit="handleSaveItem(event)" class="space-y-4">
                 <input type="hidden" id="edit-index" value="-1">
                 <div>
@@ -317,8 +332,8 @@
         let isAdmin = false;
         let items = JSON.parse(localStorage.getItem('hub_items')) || [];
         let siteConfig = JSON.parse(localStorage.getItem('hub_config')) || {
-            title: "Interactive Content Hub",
-            desc: "Click any card to explore. Built for creators.",
+            title: "CREATED BY fmi774",
+            desc: "",
             headerAlign: "center",
             headerPos: "center"
         };
@@ -477,7 +492,7 @@
                 grid.innerHTML = `
                     <div class="col-span-full text-center py-16 muted-text border border-dashed border-themed card-radius">
                         <i class="fa-solid fa-box-open text-4xl mb-3"></i>
-                        <p>No links yet. Switch to admin mode to add one.</p>
+                        <p>No modules yet. Switch to admin mode to add one.</p>
                     </div>`;
                 return;
             }
@@ -486,7 +501,7 @@
                 const iconClass = linkIcons[item.linkType] || linkIcons.play;
                 const showIcon = item.linkType && item.linkType !== 'none';
                 return `
-                <div class="card-bg-real border border-themed hover:accent-border card-radius overflow-hidden transition-all group relative shadow-lg fade-in" style="animation-delay:${index * 0.05}s">
+                <div class="card-bg-real border border-themed hover:accent-border card-radius overflow-hidden transition-all group relative shadow-lg fade-in glow-card" style="animation-delay:${index * 0.05}s">
                     ${isAdmin ? `
                         <div class="absolute top-3 right-3 z-20 flex gap-2">
                             <button onclick="editItem(${index})" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Edit">
@@ -625,8 +640,8 @@
         // ===== Add / Edit Item =====
         function openAddModal() {
             editingIndex = -1;
-            document.getElementById('add-modal-title').innerText = "Add Link Card";
-            document.getElementById('save-btn-text').innerText = "Save Link Card";
+            document.getElementById('add-modal-title').innerText = "Add Module";
+            document.getElementById('save-btn-text').innerText = "Save Module";
             document.getElementById('add-form').reset();
             document.getElementById('edit-index').value = "-1";
             document.getElementById('image-preview-container').classList.add('hidden');
@@ -642,8 +657,8 @@
         function editItem(index) {
             const item = items[index];
             editingIndex = index;
-            document.getElementById('add-modal-title').innerText = "Edit Link Card";
-            document.getElementById('save-btn-text').innerText = "Update Link Card";
+            document.getElementById('add-modal-title').innerText = "Edit Module";
+            document.getElementById('save-btn-text').innerText = "Update Module";
             document.getElementById('item-title').value = item.title;
             document.getElementById('item-desc').value = item.desc;
             document.getElementById('item-link').value = item.link;
@@ -682,20 +697,20 @@
             const idx = parseInt(document.getElementById('edit-index').value);
             if (idx >= 0) {
                 items[idx] = data;
-                showToast("Link card updated!");
+                showToast("Module updated!");
             } else {
                 items.push(data);
-                showToast("Link card added!");
+                showToast("Module added!");
             }
             saveAndRefresh();
             closeAddModal();
         }
 
         function deleteItem(index) {
-            if (confirm("Delete this link card?")) {
+            if (confirm("Delete this module?")) {
                 items.splice(index, 1);
                 saveAndRefresh();
-                showToast("Link card deleted.", "info");
+                showToast("Module deleted.", "info");
             }
         }
 
