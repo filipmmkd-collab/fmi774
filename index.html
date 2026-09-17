@@ -17,6 +17,8 @@
             --base-font-size: 16px;
             --card-radius: 16px;
             --grid-columns: 3;
+            --card-max-width: 1fr;
+            --grid-justify: center;
         }
     </style>
     <style>
@@ -29,7 +31,7 @@
         .muted-text { color: var(--muted-color); }
         .border-themed { border-color: var(--border-color); }
         .card-radius { border-radius: var(--card-radius); }
-        .grid-custom { grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr)); }
+        .grid-custom { grid-template-columns: repeat(var(--grid-columns), minmax(0, var(--card-max-width))); justify-content: var(--grid-justify); }
         .link-card-img { transition: transform 0.3s ease, filter 0.3s ease; }
         .link-card-img:hover { transform: scale(1.03); filter: brightness(1.1); }
         .link-overlay { background: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
@@ -139,6 +141,21 @@
                     <option value="top">Top of page</option>
                     <option value="center">Centered vertically</option>
                 </select>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold muted-text">Card Size: <span id="card-width-val" class="accent-text">Full</span></label>
+                <input type="range" id="theme-card-width" min="180" max="600" value="600" step="20" class="w-full" oninput="applyTheme()">
+                <p class="text-xs muted-text">Slide left for smaller cards, right for full-width.</p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-semibold muted-text">Grid Position</label>
+                <div class="flex gap-2">
+                    <button onclick="setGridPosition('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-left-btn"><i class="fa-solid fa-align-left"></i></button>
+                    <button onclick="setGridPosition('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-center-btn"><i class="fa-solid fa-align-center"></i></button>
+                    <button onclick="setGridPosition('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-right-btn"><i class="fa-solid fa-align-right"></i></button>
+                </div>
             </div>
 
             <button onclick="resetTheme()" class="w-full py-2.5 rounded-lg border border-themed text-sm font-medium hover:bg-slate-700 transition">
@@ -383,7 +400,8 @@
         let themeConfig = JSON.parse(localStorage.getItem('hub_theme')) || {
             pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6',
             text: '#f1f5f9', muted: '#94a3b8', border: '#334155',
-            fontSize: 16, radius: 16, columns: 3
+            fontSize: 16, radius: 16, columns: 3,
+            cardWidth: 600, gridPosition: 'center'
         };
         let musicConfig = JSON.parse(localStorage.getItem('hub_music')) || { url: null, title: null, isData: false };
         let heroImageConfig = JSON.parse(localStorage.getItem('hub_hero_image')) || { image: null, link: null };
@@ -425,6 +443,9 @@
             root.style.setProperty('--base-font-size', t.fontSize + 'px');
             root.style.setProperty('--card-radius', t.radius + 'px');
             root.style.setProperty('--grid-columns', t.columns);
+            const cw = t.cardWidth || 600;
+            root.style.setProperty('--card-max-width', cw >= 600 ? '1fr' : cw + 'px');
+            root.style.setProperty('--grid-justify', t.gridPosition || 'center');
 
             const tp = document.getElementById('theme-page-bg'); if (tp) tp.value = t.pageBg;
             const tc = document.getElementById('theme-card-bg'); if (tc) tc.value = t.cardBg;
@@ -434,6 +455,9 @@
             const tf = document.getElementById('theme-font-size'); if (tf) { tf.value = t.fontSize; document.getElementById('font-size-val').innerText = t.fontSize + 'px'; }
             const tr = document.getElementById('theme-radius'); if (tr) { tr.value = t.radius; document.getElementById('radius-val').innerText = t.radius + 'px'; }
             const tcol = document.getElementById('theme-columns'); if (tcol) { tcol.value = t.columns; document.getElementById('cols-val').innerText = t.columns; }
+            const tcw = document.getElementById('theme-card-width'); if (tcw) { tcw.value = t.cardWidth || 600; document.getElementById('card-width-val').innerText = (t.cardWidth || 600) >= 600 ? 'Full' : (t.cardWidth || 600) + 'px'; }
+            ['grid-pos-left-btn', 'grid-pos-center-btn', 'grid-pos-right-btn'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.remove('accent-bg', 'text-white'); });
+            const gpBtn = document.getElementById('grid-pos-' + (t.gridPosition || 'center') + '-btn'); if (gpBtn) gpBtn.classList.add('accent-bg', 'text-white');
 
             applyHeaderLayout();
         }
@@ -448,12 +472,15 @@
                 border: shadeColor(document.getElementById('theme-card-bg').value, -15),
                 fontSize: parseInt(document.getElementById('theme-font-size').value),
                 radius: parseInt(document.getElementById('theme-radius').value),
-                columns: parseInt(document.getElementById('theme-columns').value)
+                columns: parseInt(document.getElementById('theme-columns').value),
+                cardWidth: parseInt(document.getElementById('theme-card-width').value),
+                gridPosition: themeConfig.gridPosition || 'center'
             };
             themeConfig = t;
             document.getElementById('font-size-val').innerText = t.fontSize + 'px';
             document.getElementById('radius-val').innerText = t.radius + 'px';
             document.getElementById('cols-val').innerText = t.columns;
+            document.getElementById('card-width-val').innerText = t.cardWidth >= 600 ? 'Full' : t.cardWidth + 'px';
             loadTheme();
             saveTheme();
         }
@@ -463,7 +490,7 @@
         }
 
         function resetTheme() {
-            themeConfig = { pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6', text: '#f1f5f9', muted: '#94a3b8', border: '#334155', fontSize: 16, radius: 16, columns: 3 };
+            themeConfig = { pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6', text: '#f1f5f9', muted: '#94a3b8', border: '#334155', fontSize: 16, radius: 16, columns: 3, cardWidth: 600, gridPosition: 'center' };
             saveTheme();
             loadTheme();
             showToast("Theme reset to defaults.", "info");
@@ -488,6 +515,12 @@
                 panel.classList.add('translate-x-full');
                 setTimeout(() => panel.classList.add('hidden'), 300);
             }
+        }
+
+        function setGridPosition(pos) {
+            themeConfig.gridPosition = pos;
+            saveTheme();
+            loadTheme();
         }
 
         function setHeaderAlign(align) {
