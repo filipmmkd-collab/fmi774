@@ -588,6 +588,12 @@
                 <div class="card-bg-real border border-themed hover:accent-border card-radius overflow-hidden transition-all group relative shadow-lg fade-in glow-card" style="animation-delay:${index * 0.05}s">
                     ${isAdmin ? `
                         <div class="absolute top-3 right-3 z-20 flex gap-2">
+                            <button onclick="moveItem(${index}, -1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move left">
+                                <i class="fa-solid fa-arrow-left text-xs"></i>
+                            </button>
+                            <button onclick="moveItem(${index}, 1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move right">
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
                             <button onclick="editItem(${index})" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Edit">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
@@ -954,6 +960,15 @@
             }
             saveAndRefresh();
             closeAddModal();
+        }
+
+        function moveItem(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= items.length) return;
+            const item = items.splice(index, 1)[0];
+            items.splice(newIndex, 0, item);
+            localStorage.setItem('hub_items', JSON.stringify(items));
+            renderItems();
         }
 
         function deleteItem(index) {
