@@ -17,8 +17,6 @@
             --base-font-size: 16px;
             --card-radius: 16px;
             --grid-columns: 3;
-            --card-max-width: 1fr;
-            --grid-justify: center;
         }
     </style>
     <style>
@@ -31,7 +29,7 @@
         .muted-text { color: var(--muted-color); }
         .border-themed { border-color: var(--border-color); }
         .card-radius { border-radius: var(--card-radius); }
-        .grid-custom { grid-template-columns: repeat(var(--grid-columns), minmax(0, var(--card-max-width))); justify-content: var(--grid-justify); }
+        .grid-custom { grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr)); }
         .link-card-img { transition: transform 0.3s ease, filter 0.3s ease; }
         .link-card-img:hover { transform: scale(1.03); filter: brightness(1.1); }
         .link-overlay { background: linear-gradient(135deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); }
@@ -116,48 +114,6 @@
                 <input type="range" id="theme-font-size" min="12" max="24" value="16" class="w-full" oninput="applyTheme()">
             </div>
 
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Card Corner Radius: <span id="radius-val" class="accent-text">16px</span></label>
-                <input type="range" id="theme-radius" min="0" max="32" value="16" class="w-full" oninput="applyTheme()">
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Cards Per Row: <span id="cols-val" class="accent-text">3</span></label>
-                <input type="range" id="theme-columns" min="1" max="5" value="3" class="w-full" oninput="applyTheme()">
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Header Alignment</label>
-                <div class="flex gap-2">
-                    <button onclick="setHeaderAlign('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="align-left-btn"><i class="fa-solid fa-align-left"></i></button>
-                    <button onclick="setHeaderAlign('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="align-center-btn"><i class="fa-solid fa-align-center"></i></button>
-                    <button onclick="setHeaderAlign('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="align-right-btn"><i class="fa-solid fa-align-right"></i></button>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Header Position</label>
-                <select id="theme-header-pos" class="w-full bg-slate-900 border border-themed rounded-lg px-3 py-2 text-sm" onchange="applyTheme()">
-                    <option value="top">Top of page</option>
-                    <option value="center">Centered vertically</option>
-                </select>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Card Size: <span id="card-width-val" class="accent-text">Full</span></label>
-                <input type="range" id="theme-card-width" min="180" max="600" value="600" step="20" class="w-full" oninput="applyTheme()">
-                <p class="text-xs muted-text">Slide left for smaller cards, right for full-width.</p>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-semibold muted-text">Grid Position</label>
-                <div class="flex gap-2">
-                    <button onclick="setGridPosition('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-left-btn"><i class="fa-solid fa-align-left"></i></button>
-                    <button onclick="setGridPosition('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-center-btn"><i class="fa-solid fa-align-center"></i></button>
-                    <button onclick="setGridPosition('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="grid-pos-right-btn"><i class="fa-solid fa-align-right"></i></button>
-                </div>
-            </div>
-
             <button onclick="resetTheme()" class="w-full py-2.5 rounded-lg border border-themed text-sm font-medium hover:bg-slate-700 transition">
                 <i class="fa-solid fa-rotate-left"></i> Reset to Defaults
             </button>
@@ -167,13 +123,21 @@
     <!-- Hero Section -->
     <header id="hero-section" class="min-h-screen flex flex-col justify-center p-6 md:p-12 relative border-b border-themed">
         <div id="hero-content" class="text-center max-w-3xl mx-auto my-auto space-y-6">
-            <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold tracking-tight glow-text outline-none focus:ring-2 focus:ring-blue-500 rounded px-2" contenteditable="false">
-                CREATED BY fmi774
-            </h1>
+            <div id="title-wrapper" class="relative inline-block">
+                <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold tracking-tight glow-text outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 cursor-default" contenteditable="false">
+                    CREATED BY fmi774
+                </h1>
+                <button id="title-edit-btn" onclick="openTitleSettings()" class="hidden absolute -top-3 -right-3 z-20 w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Title Settings">
+                    <i class="fa-solid fa-sliders text-xs"></i>
+                </button>
+            </div>
             <p id="hero-desc" class="hidden" contenteditable="false"></p>
             <div id="hero-image-container" class="hidden">
                 <a id="hero-image-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-block relative group">
-                    <img id="hero-image" src="" alt="Hero" class="max-w-xs md:max-w-sm w-full rounded-2xl border border-themed shadow-2xl transition-all duration-300 group-hover:scale-105 glow-card object-cover">
+                    <img id="hero-image" src="" alt="Hero" class="rounded-2xl border border-themed shadow-2xl transition-all duration-300 group-hover:scale-105 glow-card object-cover">
+                    <button id="hero-image-edit-btn" onclick="event.preventDefault(); event.stopPropagation(); openHeroImageModal()" class="hidden absolute -top-3 -right-3 z-20 w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Image Settings">
+                        <i class="fa-solid fa-sliders text-xs"></i>
+                    </button>
                 </a>
             </div>
             <div id="hero-image-admin-controls" class="hidden">
@@ -344,7 +308,7 @@
 
     <!-- Modal: Hero Image -->
     <div id="hero-image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl">
+        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeHeroImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
@@ -358,6 +322,18 @@
                     <label class="block text-sm font-medium muted-text mb-1">Link URL (where clicking the image goes)</label>
                     <input type="url" id="hero-img-link" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://tiktok.com/@yourname">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Image Width: <span id="hero-img-width-val" class="accent-text">384px</span></label>
+                    <input type="range" id="hero-img-width" min="100" max="800" value="384" step="20" class="w-full" oninput="document.getElementById('hero-img-width-val').innerText = this.value + 'px'">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Image Position</label>
+                    <div class="flex gap-2">
+                        <button onclick="setHeroImgPos('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-left-btn"><i class="fa-solid fa-align-left"></i></button>
+                        <button onclick="setHeroImgPos('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-center-btn"><i class="fa-solid fa-align-center"></i></button>
+                        <button onclick="setHeroImgPos('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-right-btn"><i class="fa-solid fa-align-right"></i></button>
+                    </div>
+                </div>
                 <div id="hero-img-preview-container" class="hidden">
                     <label class="block text-sm font-medium muted-text mb-1">Preview</label>
                     <img id="hero-img-preview" class="w-full max-h-40 object-cover rounded-lg border border-themed" alt="Preview">
@@ -367,6 +343,49 @@
                 </button>
                 <button onclick="removeHeroImage()" class="w-full border border-themed hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-lg transition text-sm">
                     <i class="fa-solid fa-trash"></i> Remove Hero Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Title Settings -->
+    <div id="title-settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl">
+            <button onclick="closeTitleSettings()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-text-height accent-text"></i> Title Settings</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Title Text</label>
+                    <input type="text" id="title-text-input" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="CREATED BY fmi774">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Font Size: <span id="title-font-size-val" class="accent-text">72px</span></label>
+                    <input type="range" id="title-font-size" min="24" max="120" value="72" step="4" class="w-full" oninput="document.getElementById('title-font-size-val').innerText = this.value + 'px'">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Text Alignment</label>
+                    <div class="flex gap-2">
+                        <button onclick="setTitleAlign('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="title-align-left-btn"><i class="fa-solid fa-align-left"></i></button>
+                        <button onclick="setTitleAlign('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="title-align-center-btn"><i class="fa-solid fa-align-center"></i></button>
+                        <button onclick="setTitleAlign('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="title-align-right-btn"><i class="fa-solid fa-align-right"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Vertical Position</label>
+                    <select id="title-pos-select" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+                        <option value="top">Top of page</option>
+                        <option value="center" selected>Centered vertically</option>
+                        <option value="bottom">Bottom of page</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Move Up/Down: <span id="title-margin-val" class="accent-text">0px</span></label>
+                    <input type="range" id="title-margin" min="-200" max="200" value="0" step="10" class="w-full" oninput="document.getElementById('title-margin-val').innerText = this.value + 'px'">
+                </div>
+                <button onclick="saveTitleSettings()" class="w-full accent-bg hover:opacity-90 text-white font-medium py-3 rounded-lg transition shadow">
+                    <i class="fa-solid fa-check"></i> Save Title Settings
                 </button>
             </div>
         </div>
@@ -400,11 +419,11 @@
         let themeConfig = JSON.parse(localStorage.getItem('hub_theme')) || {
             pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6',
             text: '#f1f5f9', muted: '#94a3b8', border: '#334155',
-            fontSize: 16, radius: 16, columns: 3,
-            cardWidth: 600, gridPosition: 'center'
+            fontSize: 16, radius: 16, columns: 3
         };
         let musicConfig = JSON.parse(localStorage.getItem('hub_music')) || { url: null, title: null, isData: false };
-        let heroImageConfig = JSON.parse(localStorage.getItem('hub_hero_image')) || { image: null, link: null };
+        let heroImageConfig = JSON.parse(localStorage.getItem('hub_hero_image')) || { image: null, link: null, size: 'sm', pos: 'center', width: 384 };
+        let titleConfig = JSON.parse(localStorage.getItem('hub_title_config')) || { fontSize: 72, align: 'center', pos: 'center', marginTop: 0 };
         let pendingPasswordAction = null;
         let editingIndex = -1;
 
@@ -443,9 +462,6 @@
             root.style.setProperty('--base-font-size', t.fontSize + 'px');
             root.style.setProperty('--card-radius', t.radius + 'px');
             root.style.setProperty('--grid-columns', t.columns);
-            const cw = t.cardWidth || 600;
-            root.style.setProperty('--card-max-width', cw >= 600 ? '1fr' : cw + 'px');
-            root.style.setProperty('--grid-justify', t.gridPosition || 'center');
 
             const tp = document.getElementById('theme-page-bg'); if (tp) tp.value = t.pageBg;
             const tc = document.getElementById('theme-card-bg'); if (tc) tc.value = t.cardBg;
@@ -455,11 +471,9 @@
             const tf = document.getElementById('theme-font-size'); if (tf) { tf.value = t.fontSize; document.getElementById('font-size-val').innerText = t.fontSize + 'px'; }
             const tr = document.getElementById('theme-radius'); if (tr) { tr.value = t.radius; document.getElementById('radius-val').innerText = t.radius + 'px'; }
             const tcol = document.getElementById('theme-columns'); if (tcol) { tcol.value = t.columns; document.getElementById('cols-val').innerText = t.columns; }
-            const tcw = document.getElementById('theme-card-width'); if (tcw) { tcw.value = t.cardWidth || 600; document.getElementById('card-width-val').innerText = (t.cardWidth || 600) >= 600 ? 'Full' : (t.cardWidth || 600) + 'px'; }
-            ['grid-pos-left-btn', 'grid-pos-center-btn', 'grid-pos-right-btn'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.remove('accent-bg', 'text-white'); });
-            const gpBtn = document.getElementById('grid-pos-' + (t.gridPosition || 'center') + '-btn'); if (gpBtn) gpBtn.classList.add('accent-bg', 'text-white');
 
             applyHeaderLayout();
+            applyTitleConfig();
         }
 
         function applyTheme() {
@@ -472,15 +486,12 @@
                 border: shadeColor(document.getElementById('theme-card-bg').value, -15),
                 fontSize: parseInt(document.getElementById('theme-font-size').value),
                 radius: parseInt(document.getElementById('theme-radius').value),
-                columns: parseInt(document.getElementById('theme-columns').value),
-                cardWidth: parseInt(document.getElementById('theme-card-width').value),
-                gridPosition: themeConfig.gridPosition || 'center'
+                columns: parseInt(document.getElementById('theme-columns').value)
             };
             themeConfig = t;
             document.getElementById('font-size-val').innerText = t.fontSize + 'px';
             document.getElementById('radius-val').innerText = t.radius + 'px';
             document.getElementById('cols-val').innerText = t.columns;
-            document.getElementById('card-width-val').innerText = t.cardWidth >= 600 ? 'Full' : t.cardWidth + 'px';
             loadTheme();
             saveTheme();
         }
@@ -490,7 +501,7 @@
         }
 
         function resetTheme() {
-            themeConfig = { pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6', text: '#f1f5f9', muted: '#94a3b8', border: '#334155', fontSize: 16, radius: 16, columns: 3, cardWidth: 600, gridPosition: 'center' };
+            themeConfig = { pageBg: '#0f172a', cardBg: '#1e293b', accent: '#3b82f6', text: '#f1f5f9', muted: '#94a3b8', border: '#334155', fontSize: 16, radius: 16, columns: 3 };
             saveTheme();
             loadTheme();
             showToast("Theme reset to defaults.", "info");
@@ -515,12 +526,6 @@
                 panel.classList.add('translate-x-full');
                 setTimeout(() => panel.classList.add('hidden'), 300);
             }
-        }
-
-        function setGridPosition(pos) {
-            themeConfig.gridPosition = pos;
-            saveTheme();
-            loadTheme();
         }
 
         function setHeaderAlign(align) {
@@ -558,6 +563,7 @@
             document.getElementById('hero-title').innerText = siteConfig.title;
             document.getElementById('hero-desc').innerText = siteConfig.desc;
             applyHeaderLayout();
+            applyTitleConfig();
         }
 
         // ===== Render Cards =====
@@ -697,14 +703,17 @@
         function setHeaderEditable(on) {
             const title = document.getElementById('hero-title');
             const desc = document.getElementById('hero-desc');
+            const titleEditBtn = document.getElementById('title-edit-btn');
             title.contentEditable = on;
             desc.contentEditable = on;
             if (on) {
                 title.classList.add('border', 'border-blue-500/50', 'bg-slate-900/40');
                 desc.classList.add('border', 'border-blue-500/50', 'bg-slate-900/40');
+                titleEditBtn.classList.remove('hidden');
             } else {
                 title.classList.remove('border', 'border-blue-500/50', 'bg-slate-900/40');
                 desc.classList.remove('border', 'border-blue-500/50', 'bg-slate-900/40');
+                titleEditBtn.classList.add('hidden');
             }
         }
 
@@ -723,10 +732,19 @@
             const adminControls = document.getElementById('hero-image-admin-controls');
             const img = document.getElementById('hero-image');
             const link = document.getElementById('hero-image-link');
+            const editBtn = document.getElementById('hero-image-edit-btn');
             if (heroImageConfig.image) {
                 img.src = heroImageConfig.image;
                 link.href = heroImageConfig.link || '#';
+                img.style.width = (heroImageConfig.width || 384) + 'px';
+                img.style.maxWidth = '100%';
                 container.classList.remove('hidden');
+                container.style.textAlign = heroImageConfig.pos || 'center';
+                container.style.display = heroImageConfig.pos === 'left' ? 'block' : (heroImageConfig.pos === 'right' ? 'block' : 'block');
+                container.style.marginLeft = heroImageConfig.pos === 'right' ? 'auto' : '';
+                container.style.marginRight = heroImageConfig.pos === 'left' ? 'auto' : '';
+                if (isAdmin) editBtn.classList.remove('hidden');
+                else editBtn.classList.add('hidden');
             } else {
                 container.classList.add('hidden');
             }
@@ -740,6 +758,9 @@
         function openHeroImageModal() {
             document.getElementById('hero-img-url').value = heroImageConfig.image || '';
             document.getElementById('hero-img-link').value = heroImageConfig.link || '';
+            document.getElementById('hero-img-width').value = heroImageConfig.width || 384;
+            document.getElementById('hero-img-width-val').innerText = (heroImageConfig.width || 384) + 'px';
+            setHeroImgPos(heroImageConfig.pos || 'center');
             previewHeroImage();
             const m = document.getElementById('hero-image-modal');
             m.classList.remove('hidden'); m.classList.add('flex');
@@ -748,6 +769,13 @@
         function closeHeroImageModal() {
             const m = document.getElementById('hero-image-modal');
             m.classList.remove('flex'); m.classList.add('hidden');
+        }
+
+        function setHeroImgPos(pos) {
+            ['hero-img-pos-left-btn', 'hero-img-pos-center-btn', 'hero-img-pos-right-btn'].forEach(id => {
+                const b = document.getElementById(id); if (b) b.classList.remove('accent-bg', 'text-white');
+            });
+            const b = document.getElementById('hero-img-pos-' + pos + '-btn'); if (b) b.classList.add('accent-bg', 'text-white');
         }
 
         function previewHeroImage() {
@@ -766,11 +794,16 @@
         function saveHeroImage() {
             const image = document.getElementById('hero-img-url').value.trim();
             const link = document.getElementById('hero-img-link').value.trim();
+            const width = parseInt(document.getElementById('hero-img-width').value);
+            const posEl = document.querySelector('#hero-img-pos-left-btn.accent-bg, #hero-img-pos-center-btn.accent-bg, #hero-img-pos-right-btn.accent-bg');
+            let pos = 'center';
+            if (posEl && posEl.id.includes('left')) pos = 'left';
+            else if (posEl && posEl.id.includes('right')) pos = 'right';
             if (!image) {
                 showToast("Please provide an image URL.", "error");
                 return;
             }
-            heroImageConfig = { image, link };
+            heroImageConfig = { image, link, width, pos };
             localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
             renderHeroImage();
             closeHeroImageModal();
@@ -778,11 +811,80 @@
         }
 
         function removeHeroImage() {
-            heroImageConfig = { image: null, link: null };
+            heroImageConfig = { image: null, link: null, width: 384, pos: 'center' };
             localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
             renderHeroImage();
             closeHeroImageModal();
             showToast("Hero image removed.", "info");
+        }
+
+        // ===== Title Settings =====
+        function applyTitleConfig() {
+            const title = document.getElementById('hero-title');
+            const wrapper = document.getElementById('title-wrapper');
+            const hero = document.getElementById('hero-section');
+            const content = document.getElementById('hero-content');
+            title.style.fontSize = (titleConfig.fontSize || 72) + 'px';
+            title.style.lineHeight = '1.1';
+            content.classList.remove('text-left', 'text-center', 'text-right');
+            content.classList.add('text-' + (titleConfig.align || 'center'));
+            const pos = titleConfig.pos || 'center';
+            if (pos === 'top') {
+                hero.classList.remove('justify-center', 'justify-end');
+                hero.classList.add('justify-start', 'pt-20');
+            } else if (pos === 'bottom') {
+                hero.classList.remove('justify-start', 'justify-center', 'pt-20');
+                hero.classList.add('justify-end', 'pb-20');
+            } else {
+                hero.classList.remove('justify-start', 'justify-end', 'pt-20', 'pb-20');
+                hero.classList.add('justify-center');
+            }
+            content.style.marginTop = (titleConfig.marginTop || 0) + 'px';
+        }
+
+        function openTitleSettings() {
+            document.getElementById('title-text-input').value = siteConfig.title;
+            document.getElementById('title-font-size').value = titleConfig.fontSize || 72;
+            document.getElementById('title-font-size-val').innerText = (titleConfig.fontSize || 72) + 'px';
+            document.getElementById('title-pos-select').value = titleConfig.pos || 'center';
+            document.getElementById('title-margin').value = titleConfig.marginTop || 0;
+            document.getElementById('title-margin-val').innerText = (titleConfig.marginTop || 0) + 'px';
+            setTitleAlign(titleConfig.align || 'center');
+            const m = document.getElementById('title-settings-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function closeTitleSettings() {
+            const m = document.getElementById('title-settings-modal');
+            m.classList.remove('flex'); m.classList.add('hidden');
+        }
+
+        function setTitleAlign(align) {
+            ['title-align-left-btn', 'title-align-center-btn', 'title-align-right-btn'].forEach(id => {
+                const b = document.getElementById(id); if (b) b.classList.remove('accent-bg', 'text-white');
+            });
+            const b = document.getElementById('title-align-' + align + '-btn'); if (b) b.classList.add('accent-bg', 'text-white');
+        }
+
+        function saveTitleSettings() {
+            const text = document.getElementById('title-text-input').value.trim() || "CREATED BY fmi774";
+            const fontSize = parseInt(document.getElementById('title-font-size').value);
+            const pos = document.getElementById('title-pos-select').value;
+            const marginTop = parseInt(document.getElementById('title-margin').value);
+            const alignEl = document.querySelector('#title-align-left-btn.accent-bg, #title-align-center-btn.accent-bg, #title-align-right-btn.accent-bg');
+            let align = 'center';
+            if (alignEl && alignEl.id.includes('left')) align = 'left';
+            else if (alignEl && alignEl.id.includes('right')) align = 'right';
+            siteConfig.title = text;
+            siteConfig.headerAlign = align;
+            siteConfig.headerPos = pos;
+            titleConfig = { fontSize, align, pos, marginTop };
+            localStorage.setItem('hub_config', JSON.stringify(siteConfig));
+            localStorage.setItem('hub_title_config', JSON.stringify(titleConfig));
+            renderConfig();
+            applyTitleConfig();
+            closeTitleSettings();
+            showToast("Title settings saved!");
         }
 
         // ===== Add / Edit Item =====
