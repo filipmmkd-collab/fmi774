@@ -65,6 +65,9 @@
             animation: glowPulse 3s ease-in-out infinite;
         }
     </style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body class="font-sans min-h-screen flex flex-col selection:bg-blue-500 selection:text-white" id="app-body">
 
@@ -151,6 +154,16 @@
                 CREATED BY fmi774
             </h1>
             <p id="hero-desc" class="hidden" contenteditable="false"></p>
+            <div id="hero-image-container" class="hidden">
+                <a id="hero-image-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-block relative group">
+                    <img id="hero-image" src="" alt="Hero" class="max-w-xs md:max-w-sm w-full rounded-2xl border border-themed shadow-2xl transition-all duration-300 group-hover:scale-105 glow-card object-cover">
+                </a>
+            </div>
+            <div id="hero-image-admin-controls" class="hidden">
+                <button onclick="openHeroImageModal()" class="text-sm border border-themed hover:accent-bg hover:text-white px-4 py-2 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-image"></i> Set Hero Image & Link
+                </button>
+            </div>
             <div>
                 <a href="#modules-section" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-8 py-4 rounded-full transition-all glow-btn group">
                     <span>ENTER</span>
@@ -175,6 +188,9 @@
                 </button>
                 <button id="add-item-btn" onclick="openAddModal()" class="hidden items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium transition shadow">
                     <i class="fa-solid fa-plus"></i> Add Module
+                </button>
+                <button id="hero-img-btn" onclick="openHeroImageModal()" class="hidden items-center gap-2 border border-themed hover:accent-bg hover:text-white px-4 py-2 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-image"></i> Hero Image
                 </button>
             </div>
         </div>
@@ -309,6 +325,36 @@
         </div>
     </div>
 
+    <!-- Modal: Hero Image -->
+    <div id="hero-image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl">
+            <button onclick="closeHeroImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-image accent-text"></i> Hero Image & Link</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Image URL</label>
+                    <input type="url" id="hero-img-url" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/image.jpg" oninput="previewHeroImage()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Link URL (where clicking the image goes)</label>
+                    <input type="url" id="hero-img-link" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://tiktok.com/@yourname">
+                </div>
+                <div id="hero-img-preview-container" class="hidden">
+                    <label class="block text-sm font-medium muted-text mb-1">Preview</label>
+                    <img id="hero-img-preview" class="w-full max-h-40 object-cover rounded-lg border border-themed" alt="Preview">
+                </div>
+                <button onclick="saveHeroImage()" class="w-full accent-bg hover:opacity-90 text-white font-medium py-3 rounded-lg transition shadow">
+                    <i class="fa-solid fa-check"></i> Save Hero Image
+                </button>
+                <button onclick="removeHeroImage()" class="w-full border border-themed hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-lg transition text-sm">
+                    <i class="fa-solid fa-trash"></i> Remove Hero Image
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Password Prompt -->
     <div id="password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="card-bg-real border border-themed w-full max-w-sm rounded-2xl p-6 relative shadow-2xl text-center">
@@ -340,6 +386,7 @@
             fontSize: 16, radius: 16, columns: 3
         };
         let musicConfig = JSON.parse(localStorage.getItem('hub_music')) || { url: null, title: null, isData: false };
+        let heroImageConfig = JSON.parse(localStorage.getItem('hub_hero_image')) || { image: null, link: null };
         let pendingPasswordAction = null;
         let editingIndex = -1;
 
@@ -349,6 +396,7 @@
             renderConfig();
             renderItems();
             loadMusicState();
+            renderHeroImage();
         });
 
         // ===== Toast =====
@@ -601,10 +649,11 @@
                 showToast("Admin mode deactivated. Changes saved.", "info");
             }
             renderItems();
+            renderHeroImage();
         }
 
         function showAdminButtons(show) {
-            const btns = ['add-item-btn', 'theme-btn', 'music-btn'];
+            const btns = ['add-item-btn', 'theme-btn', 'music-btn', 'hero-img-btn'];
             btns.forEach(id => {
                 const el = document.getElementById(id);
                 if (show) { el.classList.remove('hidden'); el.classList.add('flex'); }
@@ -632,6 +681,75 @@
             showAdminButtons(true);
             setHeaderEditable(true);
             renderItems();
+            renderHeroImage();
+        }
+
+        // ===== Hero Image =====
+        function renderHeroImage() {
+            const container = document.getElementById('hero-image-container');
+            const adminControls = document.getElementById('hero-image-admin-controls');
+            const img = document.getElementById('hero-image');
+            const link = document.getElementById('hero-image-link');
+            if (heroImageConfig.image) {
+                img.src = heroImageConfig.image;
+                link.href = heroImageConfig.link || '#';
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+            if (isAdmin) {
+                adminControls.classList.remove('hidden');
+            } else {
+                adminControls.classList.add('hidden');
+            }
+        }
+
+        function openHeroImageModal() {
+            document.getElementById('hero-img-url').value = heroImageConfig.image || '';
+            document.getElementById('hero-img-link').value = heroImageConfig.link || '';
+            previewHeroImage();
+            const m = document.getElementById('hero-image-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function closeHeroImageModal() {
+            const m = document.getElementById('hero-image-modal');
+            m.classList.remove('flex'); m.classList.add('hidden');
+        }
+
+        function previewHeroImage() {
+            const url = document.getElementById('hero-img-url').value;
+            const container = document.getElementById('hero-img-preview-container');
+            const img = document.getElementById('hero-img-preview');
+            if (url) {
+                img.src = url;
+                container.classList.remove('hidden');
+                img.onerror = () => container.classList.add('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function saveHeroImage() {
+            const image = document.getElementById('hero-img-url').value.trim();
+            const link = document.getElementById('hero-img-link').value.trim();
+            if (!image) {
+                showToast("Please provide an image URL.", "error");
+                return;
+            }
+            heroImageConfig = { image, link };
+            localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
+            renderHeroImage();
+            closeHeroImageModal();
+            showToast("Hero image saved!");
+        }
+
+        function removeHeroImage() {
+            heroImageConfig = { image: null, link: null };
+            localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
+            renderHeroImage();
+            closeHeroImageModal();
+            showToast("Hero image removed.", "info");
         }
 
         // ===== Add / Edit Item =====
