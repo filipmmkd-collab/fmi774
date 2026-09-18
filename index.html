@@ -146,23 +146,29 @@
                 </a>
             </div>
             <div id="hero-music-controls" class="hidden">
-                <div class="inline-flex items-center gap-3 card-bg-real border border-themed rounded-2xl shadow-xl px-4 py-3 max-w-sm mx-auto">
-                    <button onclick="togglePlayMusic()" id="play-pause-btn-2" class="w-9 h-9 rounded-full accent-bg text-white flex items-center justify-center hover:opacity-80 transition shrink-0">
-                        <i class="fa-solid fa-play" id="play-icon-2"></i>
-                    </button>
-                    <div class="flex flex-col min-w-[120px] flex-1">
-                        <span id="now-playing-title-2" class="text-xs font-semibold truncate max-w-[180px]">No song loaded</span>
-                        <input type="range" id="music-seek-2" min="0" max="100" value="0" class="w-full mt-1 h-1" oninput="seekMusic(2)">
+                <div class="card-bg-real border border-themed rounded-2xl shadow-xl px-4 py-3 max-w-xs mx-auto">
+                    <div class="flex items-center gap-3">
+                        <img id="now-playing-cover" src="" alt="" class="w-14 h-14 rounded-lg object-cover border border-themed shrink-0 hidden">
+                        <div class="flex-1 min-w-0 text-left">
+                            <span id="now-playing-title-2" class="text-sm font-semibold block truncate">No song loaded</span>
+                            <span id="now-playing-time" class="text-xs muted-text">0:00 / 0:00</span>
+                        </div>
                     </div>
-                    <button onclick="shuffleMusic()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Shuffle">
-                        <i class="fa-solid fa-shuffle text-sm"></i>
-                    </button>
-                    <button onclick="nextSong()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Next">
-                        <i class="fa-solid fa-forward-step text-sm"></i>
-                    </button>
-                    <div class="flex items-center gap-1 shrink-0">
-                        <i class="fa-solid fa-volume-low text-xs muted-text"></i>
-                        <input type="range" id="music-volume-2" min="0" max="100" value="70" class="w-16 h-1" oninput="setVolume(2)">
+                    <div class="flex items-center gap-2 mt-2">
+                        <button onclick="togglePlayMusic()" id="play-pause-btn-2" class="w-9 h-9 rounded-full accent-bg text-white flex items-center justify-center hover:opacity-80 transition shrink-0">
+                            <i class="fa-solid fa-play" id="play-icon-2"></i>
+                        </button>
+                        <button onclick="nextSong()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Skip">
+                            <i class="fa-solid fa-forward-step text-sm"></i>
+                        </button>
+                        <button onclick="shuffleMusic()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Shuffle">
+                            <i class="fa-solid fa-shuffle text-sm"></i>
+                        </button>
+                        <input type="range" id="music-seek-2" min="0" max="100" value="0" class="flex-1 h-1" oninput="seekMusic(2)">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-volume-low text-xs muted-text"></i>
+                            <input type="range" id="music-volume-2" min="0" max="100" value="70" class="w-14 h-1" oninput="setVolume(2)">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,17 +238,20 @@
                     <input type="text" id="item-title" required class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="Card title">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Description *</label>
-                    <textarea id="item-desc" rows="2" required class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="Short description shown on the card"></textarea>
+                    <label class="block text-sm font-medium muted-text mb-1">Description</label>
+                    <textarea id="item-desc" rows="2" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="Short description shown on the card"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Link URL * <span class="text-xs muted-text">(hidden inside the image — clicking the image opens this)</span></label>
-                    <input type="url" id="item-link" required class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://tiktok.com/@yourname or https://youtube.com/watch?v=...">
+                    <label class="block text-sm font-medium muted-text mb-1">Link URL <span class="text-xs muted-text">(optional — hidden inside the image)</span></label>
+                    <input type="url" id="item-link" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://tiktok.com/@yourname or https://youtube.com/watch?v=...">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Image URL * <span class="text-xs muted-text">(the thumbnail/cover for the link)</span></label>
-                    <input type="url" id="item-image" required class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/image.jpg" oninput="previewCardImage()">
-                    <p class="text-xs muted-text mt-1">Paste a direct image URL. The link URL stays hidden — only the image is visible.</p>
+                    <label class="block text-sm font-medium muted-text mb-1">Image URL <span class="text-xs muted-text">(optional)</span></label>
+                    <input type="url" id="item-image" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/image.jpg" oninput="previewCardImage()">
+                </div>
+                <div class="text-center text-sm muted-text">— or upload an image —</div>
+                <div>
+                    <input type="file" id="item-image-file" accept="image/*" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 cursor-pointer" onchange="handleCardImageUpload(event)">
                 </div>
                 <div>
                     <label class="block text-sm font-medium muted-text mb-1">Image Size</label>
@@ -268,7 +277,7 @@
                     <img id="image-preview" class="w-full max-h-40 object-cover rounded-lg border border-themed" alt="Preview">
                 </div>
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-lg transition shadow">
-                    <span id="save-btn-text">Save Link Card</span>
+                    <span id="save-btn-text">Save Module</span>
                 </button>
             </form>
         </div>
@@ -297,6 +306,10 @@
                 <div>
                     <label class="block text-sm font-medium muted-text mb-1">Song Title (optional)</label>
                     <input type="text" id="music-title" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="e.g. My Favorite Beat">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Cover Image URL (optional)</label>
+                    <input type="url" id="music-cover" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/cover.jpg">
                 </div>
                 <button onclick="addSong()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-lg transition shadow">
                     <i class="fa-solid fa-plus"></i> Add Song
@@ -588,35 +601,39 @@
                 const h = imgSizes[item.imgSize] || imgSizes.medium;
                 const iconClass = linkIcons[item.linkType] || linkIcons.play;
                 const showIcon = item.linkType && item.linkType !== 'none';
+                const hasLink = item.link && item.link.trim();
+                const hasImage = item.image && item.image.trim();
+                const imgSrc = hasImage ? escapeAttr(item.image) : 'https://images.pexels.com/photos/1749822/pexels-photo-1749822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940';
+                const clickHandler = hasLink
+                    ? `onclick="window.open('${escapeAttr(item.link)}', '_blank', 'noopener noreferrer')"`
+                    : `onclick="openDetailModal(${index})"`;
                 return `
-                <div class="card-bg-real border border-themed hover:accent-border card-radius overflow-hidden transition-all group relative shadow-lg fade-in glow-card" style="animation-delay:${index * 0.05}s">
+                <div class="card-bg-real border border-themed hover:accent-border card-radius overflow-hidden transition-all group relative shadow-lg fade-in glow-card cursor-pointer" style="animation-delay:${index * 0.05}s" ${clickHandler}>
                     ${isAdmin ? `
                         <div class="absolute top-3 right-3 z-20 flex gap-2">
-                            <button onclick="moveItem(${index}, -1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move left">
+                            <button onclick="event.stopPropagation(); moveItem(${index}, -1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move left">
                                 <i class="fa-solid fa-arrow-left text-xs"></i>
                             </button>
-                            <button onclick="moveItem(${index}, 1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move right">
+                            <button onclick="event.stopPropagation(); moveItem(${index}, 1)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move right">
                                 <i class="fa-solid fa-arrow-right text-xs"></i>
                             </button>
-                            <button onclick="editItem(${index})" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Edit">
+                            <button onclick="event.stopPropagation(); editItem(${index})" class="w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Edit">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
-                            <button onclick="deleteItem(${index})" class="w-8 h-8 rounded-full bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white flex items-center justify-center transition" title="Delete">
+                            <button onclick="event.stopPropagation(); deleteItem(${index})" class="w-8 h-8 rounded-full bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white flex items-center justify-center transition" title="Delete">
                                 <i class="fa-solid fa-xmark text-xs"></i>
                             </button>
                         </div>
                     ` : ''}
-                    <a href="${escapeAttr(item.link)}" target="_blank" rel="noopener noreferrer" class="link-card-wrapper relative block overflow-hidden">
-                        <div class="relative overflow-hidden" style="height:${h}">
-                            <img src="${escapeAttr(item.image)}" alt="${escapeAttr(item.title)}" class="link-card-img w-full h-full object-cover" loading="lazy" onerror="this.src='https://images.pexels.com/photos/1749822/pexels-photo-1749822.jpeg?auto=compress&cs=tinysrgb&h=650&w=940'">
-                            <div class="link-overlay absolute inset-0 flex items-center justify-center">
-                                ${showIcon ? `<i class="fa-solid ${iconClass} text-5xl text-white drop-shadow-lg play-btn opacity-90"></i>` : ''}
-                            </div>
+                    <div class="relative overflow-hidden" style="height:${h}">
+                        <img src="${imgSrc}" alt="${escapeAttr(item.title)}" class="link-card-img w-full h-full object-cover" loading="lazy">
+                        <div class="link-overlay absolute inset-0 flex items-center justify-center">
+                            ${showIcon ? `<i class="fa-solid ${iconClass} text-5xl text-white drop-shadow-lg play-btn opacity-90"></i>` : ''}
                         </div>
-                    </a>
+                    </div>
                     <div class="p-5">
                         <h3 class="text-lg font-bold mb-1 group-hover:accent-text transition-colors">${escapeHtml(item.title)}</h3>
-                        <p class="muted-text text-sm line-clamp-2">${escapeHtml(item.desc)}</p>
+                        ${item.desc ? `<p class="muted-text text-sm line-clamp-2">${escapeHtml(item.desc)}</p>` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -1005,6 +1022,10 @@
                 imgSize: document.getElementById('item-img-size').value,
                 linkType: document.getElementById('item-link-type').value
             };
+            if (!data.title) {
+                showToast("Please enter a title.", "error");
+                return;
+            }
             const idx = parseInt(document.getElementById('edit-index').value);
             if (idx >= 0) {
                 items[idx] = data;
@@ -1015,6 +1036,17 @@
             }
             saveAndRefresh();
             closeAddModal();
+        }
+
+        function handleCardImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('item-image').value = e.target.result;
+                previewCardImage();
+            };
+            reader.readAsDataURL(file);
         }
 
         function moveItem(index, direction) {
@@ -1042,12 +1074,14 @@
         // ===== Detail Modal =====
         function openDetailModal(index) {
             const item = items[index];
-            document.getElementById('detail-content').innerHTML = `
-                <h2 class="text-2xl md:text-3xl font-extrabold text-white">${escapeHtml(item.title)}</h2>
-                <p class="muted-text leading-relaxed">${escapeHtml(item.desc)}</p>
-                <a href="${escapeAttr(item.link)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-6 py-3 rounded-full transition">
+            let html = `<h2 class="text-2xl md:text-3xl font-extrabold text-white">${escapeHtml(item.title)}</h2>`;
+            if (item.desc) html += `<p class="muted-text leading-relaxed">${escapeHtml(item.desc)}</p>`;
+            if (item.link) {
+                html += `<a href="${escapeAttr(item.link)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 accent-bg hover:opacity-90 text-white font-medium px-6 py-3 rounded-full transition">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Link
                 </a>`;
+            }
+            document.getElementById('detail-content').innerHTML = html;
             const m = document.getElementById('detail-modal');
             m.classList.remove('hidden'); m.classList.add('flex');
         }
@@ -1094,6 +1128,7 @@
             if (m.classList.contains('hidden')) {
                 document.getElementById('music-url').value = '';
                 document.getElementById('music-title').value = '';
+                document.getElementById('music-cover').value = '';
                 document.getElementById('music-file').value = '';
                 renderSongsList();
                 document.getElementById('shuffle-status').innerText = musicConfig.shuffle ? 'On' : 'Off';
@@ -1112,16 +1147,18 @@
             const url = document.getElementById('music-url').value.trim();
             const fileInput = document.getElementById('music-file');
             const title = document.getElementById('music-title').value.trim() || ("Song " + ((musicConfig.songs || []).length + 1));
+            const cover = document.getElementById('music-cover').value.trim();
             if (!musicConfig.songs) musicConfig.songs = [];
 
             if (fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    musicConfig.songs.push({ url: e.target.result, title, isData: true });
+                    musicConfig.songs.push({ url: e.target.result, title, cover, isData: true });
                     saveMusicConfig();
                     renderSongsList();
                     document.getElementById('music-url').value = '';
                     document.getElementById('music-title').value = '';
+                    document.getElementById('music-cover').value = '';
                     document.getElementById('music-file').value = '';
                     document.getElementById('hero-music-controls').classList.remove('hidden');
                     if (musicConfig.songs.length === 1) playSong(0);
@@ -1129,11 +1166,12 @@
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else if (url) {
-                musicConfig.songs.push({ url, title, isData: false });
+                musicConfig.songs.push({ url, title, cover, isData: false });
                 saveMusicConfig();
                 renderSongsList();
                 document.getElementById('music-url').value = '';
                 document.getElementById('music-title').value = '';
+                document.getElementById('music-cover').value = '';
                 document.getElementById('hero-music-controls').classList.remove('hidden');
                 if (musicConfig.songs.length === 1) playSong(0);
                 showToast("Song added!");
@@ -1169,8 +1207,22 @@
             audio.src = song.url;
             audio.volume = (musicConfig.volume || 70) / 100;
             document.getElementById('now-playing-title-2').innerText = song.title || "Now Playing";
+            const coverEl = document.getElementById('now-playing-cover');
+            if (song.cover) {
+                coverEl.src = song.cover;
+                coverEl.classList.remove('hidden');
+            } else {
+                coverEl.classList.add('hidden');
+            }
             audio.play().catch(() => showToast("Click again — browsers block auto-play.", "error"));
             updatePlayIcon(true);
+        }
+
+        function formatTime(s) {
+            if (!s || isNaN(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
         }
 
         function toggleShuffleMode() {
@@ -1247,8 +1299,12 @@
         setInterval(() => {
             const audio = document.getElementById('bg-audio');
             const seek = document.getElementById('music-seek-2');
+            const timeEl = document.getElementById('now-playing-time');
             if (seek && audio.duration && !audio.paused) {
                 seek.value = (audio.currentTime / audio.duration) * 100;
+            }
+            if (timeEl && audio.duration) {
+                timeEl.innerText = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
             }
         }, 500);
 
