@@ -132,17 +132,11 @@
                 </button>
             </div>
             <p id="hero-desc" class="hidden" contenteditable="false"></p>
-            <div id="hero-image-container" class="hidden">
-                <a id="hero-image-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-block relative group">
-                    <img id="hero-image" src="" alt="Hero" class="rounded-2xl border border-themed shadow-2xl transition-all duration-300 group-hover:scale-105 glow-card object-cover">
-                    <button id="hero-image-edit-btn" onclick="event.preventDefault(); event.stopPropagation(); openHeroImageModal()" class="hidden absolute -top-3 -right-3 z-20 w-8 h-8 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Image Settings">
-                        <i class="fa-solid fa-sliders text-xs"></i>
-                    </button>
-                </a>
+            <div id="hero-links-container" class="flex flex-wrap items-center justify-center gap-4">
             </div>
             <div id="hero-image-admin-controls" class="hidden">
                 <button onclick="openHeroImageModal()" class="text-sm border border-themed hover:accent-bg hover:text-white px-4 py-2 rounded-lg font-medium transition">
-                    <i class="fa-solid fa-image"></i> Set Hero Image & Link
+                    <i class="fa-solid fa-plus"></i> Add New Link
                 </button>
             </div>
             <div>
@@ -150,6 +144,27 @@
                     <span>ENTER</span>
                     <i class="fa-solid fa-arrow-down group-hover:translate-y-1 transition-transform"></i>
                 </a>
+            </div>
+            <div id="hero-music-controls" class="hidden">
+                <div class="inline-flex items-center gap-3 card-bg-real border border-themed rounded-2xl shadow-xl px-4 py-3 max-w-sm mx-auto">
+                    <button onclick="togglePlayMusic()" id="play-pause-btn-2" class="w-9 h-9 rounded-full accent-bg text-white flex items-center justify-center hover:opacity-80 transition shrink-0">
+                        <i class="fa-solid fa-play" id="play-icon-2"></i>
+                    </button>
+                    <div class="flex flex-col min-w-[120px] flex-1">
+                        <span id="now-playing-title-2" class="text-xs font-semibold truncate max-w-[180px]">No song loaded</span>
+                        <input type="range" id="music-seek-2" min="0" max="100" value="0" class="w-full mt-1 h-1" oninput="seekMusic(2)">
+                    </div>
+                    <button onclick="shuffleMusic()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Shuffle">
+                        <i class="fa-solid fa-shuffle text-sm"></i>
+                    </button>
+                    <button onclick="nextSong()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Next">
+                        <i class="fa-solid fa-forward-step text-sm"></i>
+                    </button>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <i class="fa-solid fa-volume-low text-xs muted-text"></i>
+                        <input type="range" id="music-volume-2" min="0" max="100" value="70" class="w-16 h-1" oninput="setVolume(2)">
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -191,23 +206,7 @@
         <i class="fa-solid fa-lock text-lg group-hover:scale-110 transition-transform" id="admin-icon"></i>
     </button>
 
-    <!-- Music Player (floating, bottom-left) -->
-    <div id="music-player" class="fixed bottom-6 left-6 z-40 card-bg-real border border-themed rounded-2xl shadow-2xl p-3 flex items-center gap-3 music-player" style="display:none;">
-        <button onclick="togglePlayMusic()" id="play-pause-btn" class="w-10 h-10 rounded-full accent-bg text-white flex items-center justify-center hover:opacity-80 transition shrink-0">
-            <i class="fa-solid fa-play" id="play-icon"></i>
-        </button>
-        <div class="flex flex-col min-w-[140px]">
-            <span id="now-playing-title" class="text-xs font-semibold truncate max-w-[160px]">No song loaded</span>
-            <input type="range" id="music-seek" min="0" max="100" value="0" class="w-full mt-1 h-1" oninput="seekMusic()">
-        </div>
-        <button onclick="stopMusic()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Stop">
-            <i class="fa-solid fa-stop text-sm"></i>
-        </button>
-        <button onclick="toggleMusicPanel()" class="text-slate-400 hover:text-white w-8 h-8 flex items-center justify-center transition shrink-0" title="Change song">
-            <i class="fa-solid fa-arrow-up-from-bracket text-sm"></i>
-        </button>
-    </div>
-    <audio id="bg-audio" loop></audio>
+    <audio id="bg-audio"></audio>
 
     <!-- Modal: Item Detail View -->
     <div id="detail-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
@@ -275,16 +274,19 @@
         </div>
     </div>
 
-    <!-- Modal: Music Picker -->
+    <!-- Modal: Music Manager -->
     <div id="music-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl">
+        <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeMusicModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-music accent-text"></i> Choose Background Song</h3>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-music accent-text"></i> Music Manager</h3>
             <div class="space-y-4">
+                <div id="music-songs-list" class="space-y-2">
+                </div>
+                <hr class="border-themed">
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Song URL (mp3, wav, etc.)</label>
+                    <label class="block text-sm font-medium muted-text mb-1">Add Song — URL (mp3, wav, etc.)</label>
                     <input type="url" id="music-url" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/song.mp3">
                 </div>
                 <div class="text-center text-sm muted-text">— or —</div>
@@ -296,26 +298,26 @@
                     <label class="block text-sm font-medium muted-text mb-1">Song Title (optional)</label>
                     <input type="text" id="music-title" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="e.g. My Favorite Beat">
                 </div>
-                <button onclick="saveMusic()" class="w-full accent-bg hover:opacity-90 text-white font-medium py-3 rounded-lg transition shadow">
-                    <i class="fa-solid fa-check"></i> Set Song
+                <button onclick="addSong()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-lg transition shadow">
+                    <i class="fa-solid fa-plus"></i> Add Song
                 </button>
-                <button onclick="removeMusic()" class="w-full border border-themed hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-lg transition text-sm">
-                    <i class="fa-solid fa-trash"></i> Remove Current Song
+                <button onclick="toggleShuffleMode()" id="shuffle-toggle-btn" class="w-full border border-themed hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-lg transition text-sm">
+                    <i class="fa-solid fa-shuffle"></i> Shuffle: <span id="shuffle-status">Off</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal: Hero Image -->
+    <!-- Modal: Hero Link (Add/Edit) -->
     <div id="hero-image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
         <div class="card-bg-real border border-themed w-full max-w-md rounded-2xl p-6 md:p-8 relative shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeHeroImageModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-image accent-text"></i> Hero Image & Link</h3>
+            <h3 class="text-xl font-bold mb-4 text-white"><i class="fa-solid fa-link accent-text"></i> <span id="hero-modal-title">Add New Link</span></h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Image URL</label>
+                    <label class="block text-sm font-medium muted-text mb-1">Image URL *</label>
                     <input type="url" id="hero-img-url" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://example.com/image.jpg" oninput="previewHeroImage()">
                 </div>
                 <div>
@@ -323,26 +325,27 @@
                     <input type="url" id="hero-img-link" class="w-full bg-slate-900 border border-themed rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500" placeholder="https://tiktok.com/@yourname">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Image Width: <span id="hero-img-width-val" class="accent-text">384px</span></label>
-                    <input type="range" id="hero-img-width" min="100" max="800" value="384" step="20" class="w-full" oninput="document.getElementById('hero-img-width-val').innerText = this.value + 'px'">
+                    <label class="block text-sm font-medium muted-text mb-1">Image Width: <span id="hero-img-width-val" class="accent-text">120px</span></label>
+                    <input type="range" id="hero-img-width" min="60" max="300" value="120" step="10" class="w-full" oninput="document.getElementById('hero-img-width-val').innerText = this.value + 'px'">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium muted-text mb-1">Image Position</label>
+                    <label class="block text-sm font-medium muted-text mb-1">Image Height: <span id="hero-img-height-val" class="accent-text">120px</span></label>
+                    <input type="range" id="hero-img-height" min="60" max="300" value="120" step="10" class="w-full" oninput="document.getElementById('hero-img-height-val').innerText = this.value + 'px'">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium muted-text mb-1">Shape</label>
                     <div class="flex gap-2">
-                        <button onclick="setHeroImgPos('left')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-left-btn"><i class="fa-solid fa-align-left"></i></button>
-                        <button onclick="setHeroImgPos('center')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-center-btn"><i class="fa-solid fa-align-center"></i></button>
-                        <button onclick="setHeroImgPos('right')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-pos-right-btn"><i class="fa-solid fa-align-right"></i></button>
+                        <button onclick="setHeroImgShape('circle')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-shape-circle-btn"><i class="fa-solid fa-circle"></i> Circle</button>
+                        <button onclick="setHeroImgShape('square')" class="flex-1 py-2 rounded-lg border border-themed text-sm hover:accent-bg hover:text-white transition" id="hero-img-shape-square-btn"><i class="fa-solid fa-square"></i> Square</button>
                     </div>
                 </div>
                 <div id="hero-img-preview-container" class="hidden">
                     <label class="block text-sm font-medium muted-text mb-1">Preview</label>
-                    <img id="hero-img-preview" class="w-full max-h-40 object-cover rounded-lg border border-themed" alt="Preview">
+                    <img id="hero-img-preview" class="object-cover border border-themed" alt="Preview" style="border-radius:50%; width:120px; height:120px;">
                 </div>
+                <input type="hidden" id="hero-img-edit-index" value="-1">
                 <button onclick="saveHeroImage()" class="w-full accent-bg hover:opacity-90 text-white font-medium py-3 rounded-lg transition shadow">
-                    <i class="fa-solid fa-check"></i> Save Hero Image
-                </button>
-                <button onclick="removeHeroImage()" class="w-full border border-themed hover:bg-slate-700 text-slate-300 font-medium py-2.5 rounded-lg transition text-sm">
-                    <i class="fa-solid fa-trash"></i> Remove Hero Image
+                    <i class="fa-solid fa-check"></i> <span id="hero-save-btn-text">Add Link</span>
                 </button>
             </div>
         </div>
@@ -421,8 +424,9 @@
             text: '#f1f5f9', muted: '#94a3b8', border: '#334155',
             fontSize: 16, radius: 16, columns: 3
         };
-        let musicConfig = JSON.parse(localStorage.getItem('hub_music')) || { url: null, title: null, isData: false };
-        let heroImageConfig = JSON.parse(localStorage.getItem('hub_hero_image')) || { image: null, link: null, size: 'sm', pos: 'center', width: 384 };
+        let musicConfig = JSON.parse(localStorage.getItem('hub_music')) || { songs: [], shuffle: false, volume: 70 };
+        let heroLinks = JSON.parse(localStorage.getItem('hub_hero_links')) || [];
+        let currentSongIndex = 0;
         let titleConfig = JSON.parse(localStorage.getItem('hub_title_config')) || { fontSize: 72, align: 'center', pos: 'center', marginTop: 0 };
         let pendingPasswordAction = null;
         let editingIndex = -1;
@@ -433,7 +437,7 @@
             renderConfig();
             renderItems();
             loadMusicState();
-            renderHeroImage();
+            renderHeroLinks();
         });
 
         // ===== Toast =====
@@ -694,7 +698,7 @@
                 showToast("Admin mode deactivated. Changes saved.", "info");
             }
             renderItems();
-            renderHeroImage();
+            renderHeroLinks();
         }
 
         function showAdminButtons(show) {
@@ -729,45 +733,59 @@
             showAdminButtons(true);
             setHeaderEditable(true);
             renderItems();
-            renderHeroImage();
+            renderHeroLinks();
         }
 
-        // ===== Hero Image =====
-        function renderHeroImage() {
-            const container = document.getElementById('hero-image-container');
+        // ===== Hero Links =====
+        function renderHeroLinks() {
+            const container = document.getElementById('hero-links-container');
             const adminControls = document.getElementById('hero-image-admin-controls');
-            const img = document.getElementById('hero-image');
-            const link = document.getElementById('hero-image-link');
-            const editBtn = document.getElementById('hero-image-edit-btn');
-            if (heroImageConfig.image) {
-                img.src = heroImageConfig.image;
-                link.href = heroImageConfig.link || '#';
-                img.style.width = (heroImageConfig.width || 384) + 'px';
-                img.style.maxWidth = '100%';
-                container.classList.remove('hidden');
-                container.style.textAlign = heroImageConfig.pos || 'center';
-                container.style.display = heroImageConfig.pos === 'left' ? 'block' : (heroImageConfig.pos === 'right' ? 'block' : 'block');
-                container.style.marginLeft = heroImageConfig.pos === 'right' ? 'auto' : '';
-                container.style.marginRight = heroImageConfig.pos === 'left' ? 'auto' : '';
-                if (isAdmin) editBtn.classList.remove('hidden');
-                else editBtn.classList.add('hidden');
-            } else {
-                container.classList.add('hidden');
-            }
-            if (isAdmin) {
-                adminControls.classList.remove('hidden');
-            } else {
-                adminControls.classList.add('hidden');
-            }
+            container.innerHTML = '';
+            heroLinks.forEach((link, index) => {
+                const w = link.width || 120;
+                const h = link.height || 120;
+                const radius = link.shape === 'square' ? '12px' : '50%';
+                const div = document.createElement('div');
+                div.className = 'relative group inline-block';
+                div.innerHTML = `
+                    <a href="${escapeAttr(link.link || '#')}" target="_blank" rel="noopener noreferrer" class="inline-block transition-all duration-300 group-hover:scale-110">
+                        <img src="${escapeAttr(link.image)}" alt="Link" class="object-cover border border-themed shadow-xl glow-card transition-all" style="width:${w}px;height:${h}px;border-radius:${radius}">
+                    </a>
+                    ${isAdmin ? `
+                        <div class="absolute -top-2 -right-2 z-20 flex gap-1">
+                            <button onclick="editHeroLink(${index})" class="w-7 h-7 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Edit">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="moveHeroLink(${index}, -1)" class="w-7 h-7 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move left">
+                                <i class="fa-solid fa-arrow-left text-xs"></i>
+                            </button>
+                            <button onclick="moveHeroLink(${index}, 1)" class="w-7 h-7 rounded-full bg-slate-800/90 hover:accent-bg text-slate-200 hover:text-white flex items-center justify-center transition" title="Move right">
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                            <button onclick="deleteHeroLink(${index})" class="w-7 h-7 rounded-full bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white flex items-center justify-center transition" title="Delete">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(div);
+            });
+            if (isAdmin) adminControls.classList.remove('hidden');
+            else adminControls.classList.add('hidden');
         }
 
         function openHeroImageModal() {
-            document.getElementById('hero-img-url').value = heroImageConfig.image || '';
-            document.getElementById('hero-img-link').value = heroImageConfig.link || '';
-            document.getElementById('hero-img-width').value = heroImageConfig.width || 384;
-            document.getElementById('hero-img-width-val').innerText = (heroImageConfig.width || 384) + 'px';
-            setHeroImgPos(heroImageConfig.pos || 'center');
-            previewHeroImage();
+            document.getElementById('hero-modal-title').innerText = 'Add New Link';
+            document.getElementById('hero-save-btn-text').innerText = 'Add Link';
+            document.getElementById('hero-img-edit-index').value = '-1';
+            document.getElementById('hero-img-url').value = '';
+            document.getElementById('hero-img-link').value = '';
+            document.getElementById('hero-img-width').value = 120;
+            document.getElementById('hero-img-width-val').innerText = '120px';
+            document.getElementById('hero-img-height').value = 120;
+            document.getElementById('hero-img-height-val').innerText = '120px';
+            setHeroImgShape('circle');
+            document.getElementById('hero-img-preview-container').classList.add('hidden');
             const m = document.getElementById('hero-image-modal');
             m.classList.remove('hidden'); m.classList.add('flex');
         }
@@ -777,11 +795,30 @@
             m.classList.remove('flex'); m.classList.add('hidden');
         }
 
-        function setHeroImgPos(pos) {
-            ['hero-img-pos-left-btn', 'hero-img-pos-center-btn', 'hero-img-pos-right-btn'].forEach(id => {
+        function editHeroLink(index) {
+            const link = heroLinks[index];
+            document.getElementById('hero-modal-title').innerText = 'Edit Link';
+            document.getElementById('hero-save-btn-text').innerText = 'Update Link';
+            document.getElementById('hero-img-edit-index').value = String(index);
+            document.getElementById('hero-img-url').value = link.image || '';
+            document.getElementById('hero-img-link').value = link.link || '';
+            document.getElementById('hero-img-width').value = link.width || 120;
+            document.getElementById('hero-img-width-val').innerText = (link.width || 120) + 'px';
+            document.getElementById('hero-img-height').value = link.height || 120;
+            document.getElementById('hero-img-height-val').innerText = (link.height || 120) + 'px';
+            setHeroImgShape(link.shape || 'circle');
+            previewHeroImage();
+            const m = document.getElementById('hero-image-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+
+        function setHeroImgShape(shape) {
+            ['hero-img-shape-circle-btn', 'hero-img-shape-square-btn'].forEach(id => {
                 const b = document.getElementById(id); if (b) b.classList.remove('accent-bg', 'text-white');
             });
-            const b = document.getElementById('hero-img-pos-' + pos + '-btn'); if (b) b.classList.add('accent-bg', 'text-white');
+            const b = document.getElementById('hero-img-shape-' + shape + '-btn'); if (b) b.classList.add('accent-bg', 'text-white');
+            const img = document.getElementById('hero-img-preview');
+            if (img) img.style.borderRadius = shape === 'square' ? '12px' : '50%';
         }
 
         function previewHeroImage() {
@@ -790,6 +827,10 @@
             const img = document.getElementById('hero-img-preview');
             if (url) {
                 img.src = url;
+                const w = parseInt(document.getElementById('hero-img-width').value);
+                const h = parseInt(document.getElementById('hero-img-height').value);
+                img.style.width = w + 'px';
+                img.style.height = h + 'px';
                 container.classList.remove('hidden');
                 img.onerror = () => container.classList.add('hidden');
             } else {
@@ -801,27 +842,41 @@
             const image = document.getElementById('hero-img-url').value.trim();
             const link = document.getElementById('hero-img-link').value.trim();
             const width = parseInt(document.getElementById('hero-img-width').value);
-            const posEl = document.querySelector('#hero-img-pos-left-btn.accent-bg, #hero-img-pos-center-btn.accent-bg, #hero-img-pos-right-btn.accent-bg');
-            let pos = 'center';
-            if (posEl && posEl.id.includes('left')) pos = 'left';
-            else if (posEl && posEl.id.includes('right')) pos = 'right';
+            const height = parseInt(document.getElementById('hero-img-height').value);
+            const shapeEl = document.querySelector('#hero-img-shape-circle-btn.accent-bg, #hero-img-shape-square-btn.accent-bg');
+            const shape = shapeEl && shapeEl.id.includes('square') ? 'square' : 'circle';
             if (!image) {
                 showToast("Please provide an image URL.", "error");
                 return;
             }
-            heroImageConfig = { image, link, width, pos };
-            localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
-            renderHeroImage();
+            const idx = parseInt(document.getElementById('hero-img-edit-index').value);
+            const data = { image, link, width, height, shape };
+            if (idx >= 0) {
+                heroLinks[idx] = data;
+                showToast("Link updated!");
+            } else {
+                heroLinks.push(data);
+                showToast("Link added!");
+            }
+            localStorage.setItem('hub_hero_links', JSON.stringify(heroLinks));
+            renderHeroLinks();
             closeHeroImageModal();
-            showToast("Hero image saved!");
         }
 
-        function removeHeroImage() {
-            heroImageConfig = { image: null, link: null, width: 384, pos: 'center' };
-            localStorage.setItem('hub_hero_image', JSON.stringify(heroImageConfig));
-            renderHeroImage();
-            closeHeroImageModal();
-            showToast("Hero image removed.", "info");
+        function moveHeroLink(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= heroLinks.length) return;
+            const item = heroLinks.splice(index, 1)[0];
+            heroLinks.splice(newIndex, 0, item);
+            localStorage.setItem('hub_hero_links', JSON.stringify(heroLinks));
+            renderHeroLinks();
+        }
+
+        function deleteHeroLink(index) {
+            heroLinks.splice(index, 1);
+            localStorage.setItem('hub_hero_links', JSON.stringify(heroLinks));
+            renderHeroLinks();
+            showToast("Link removed.", "info");
         }
 
         // ===== Title Settings =====
@@ -1005,19 +1060,43 @@
         // ===== Music =====
         function loadMusicState() {
             const audio = document.getElementById('bg-audio');
-            if (musicConfig.url) {
-                audio.src = musicConfig.url;
-                document.getElementById('now-playing-title').innerText = musicConfig.title || "Now Playing";
-                document.getElementById('music-player').style.display = 'flex';
+            audio.volume = (musicConfig.volume || 70) / 100;
+            const volSlider = document.getElementById('music-volume-2');
+            if (volSlider) volSlider.value = musicConfig.volume || 70;
+            if (musicConfig.songs && musicConfig.songs.length > 0) {
+                document.getElementById('hero-music-controls').classList.remove('hidden');
+                playSong(currentSongIndex);
             }
+        }
+
+        function renderSongsList() {
+            const list = document.getElementById('music-songs-list');
+            if (!musicConfig.songs || musicConfig.songs.length === 0) {
+                list.innerHTML = '<p class="text-sm muted-text text-center py-2">No songs added yet.</p>';
+                return;
+            }
+            list.innerHTML = musicConfig.songs.map((song, i) => `
+                <div class="flex items-center gap-2 bg-slate-900 border border-themed rounded-lg px-3 py-2">
+                    <i class="fa-solid fa-music accent-text text-sm shrink-0"></i>
+                    <span class="text-sm flex-1 truncate">${escapeHtml(song.title || 'Song ' + (i + 1))}</span>
+                    <button onclick="playSong(${i})" class="text-slate-400 hover:accent-text w-7 h-7 flex items-center justify-center transition shrink-0" title="Play">
+                        <i class="fa-solid fa-play text-xs"></i>
+                    </button>
+                    <button onclick="deleteSong(${i})" class="text-slate-400 hover:text-rose-400 w-7 h-7 flex items-center justify-center transition shrink-0" title="Delete">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
         }
 
         function toggleMusicPanel() {
             const m = document.getElementById('music-modal');
             if (m.classList.contains('hidden')) {
-                document.getElementById('music-url').value = (!musicConfig.isData && musicConfig.url) ? musicConfig.url : '';
-                document.getElementById('music-title').value = musicConfig.title || '';
+                document.getElementById('music-url').value = '';
+                document.getElementById('music-title').value = '';
                 document.getElementById('music-file').value = '';
+                renderSongsList();
+                document.getElementById('shuffle-status').innerText = musicConfig.shuffle ? 'On' : 'Off';
                 m.classList.remove('hidden'); m.classList.add('flex');
             } else {
                 closeMusicModal();
@@ -1029,54 +1108,102 @@
             m.classList.remove('flex'); m.classList.add('hidden');
         }
 
-        function saveMusic() {
+        function addSong() {
             const url = document.getElementById('music-url').value.trim();
             const fileInput = document.getElementById('music-file');
-            const title = document.getElementById('music-title').value.trim() || "Now Playing";
-            const audio = document.getElementById('bg-audio');
+            const title = document.getElementById('music-title').value.trim() || ("Song " + ((musicConfig.songs || []).length + 1));
+            if (!musicConfig.songs) musicConfig.songs = [];
 
             if (fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    musicConfig = { url: e.target.result, title, isData: true };
-                    localStorage.setItem('hub_music', JSON.stringify(musicConfig));
-                    audio.src = musicConfig.url;
-                    document.getElementById('now-playing-title').innerText = title;
-                    document.getElementById('music-player').style.display = 'flex';
-                    audio.play().catch(() => {});
-                    updatePlayIcon(true);
-                    closeMusicModal();
-                    showToast("Song set! Playing now.");
+                    musicConfig.songs.push({ url: e.target.result, title, isData: true });
+                    saveMusicConfig();
+                    renderSongsList();
+                    document.getElementById('music-url').value = '';
+                    document.getElementById('music-title').value = '';
+                    document.getElementById('music-file').value = '';
+                    document.getElementById('hero-music-controls').classList.remove('hidden');
+                    if (musicConfig.songs.length === 1) playSong(0);
+                    showToast("Song added!");
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else if (url) {
-                musicConfig = { url, title, isData: false };
-                localStorage.setItem('hub_music', JSON.stringify(musicConfig));
-                audio.src = url;
-                document.getElementById('now-playing-title').innerText = title;
-                document.getElementById('music-player').style.display = 'flex';
-                audio.play().catch(() => {});
-                updatePlayIcon(true);
-                closeMusicModal();
-                showToast("Song set! Playing now.");
+                musicConfig.songs.push({ url, title, isData: false });
+                saveMusicConfig();
+                renderSongsList();
+                document.getElementById('music-url').value = '';
+                document.getElementById('music-title').value = '';
+                document.getElementById('hero-music-controls').classList.remove('hidden');
+                if (musicConfig.songs.length === 1) playSong(0);
+                showToast("Song added!");
             } else {
                 showToast("Please provide a URL or upload a file.", "error");
             }
         }
 
-        function removeMusic() {
-            const audio = document.getElementById('bg-audio');
-            audio.pause();
-            audio.src = '';
-            musicConfig = { url: null, title: null, isData: false };
-            localStorage.setItem('hub_music', JSON.stringify(musicConfig));
-            document.getElementById('music-player').style.display = 'none';
-            closeMusicModal();
+        function deleteSong(index) {
+            musicConfig.songs.splice(index, 1);
+            saveMusicConfig();
+            renderSongsList();
+            if (musicConfig.songs.length === 0) {
+                document.getElementById('hero-music-controls').classList.add('hidden');
+                const audio = document.getElementById('bg-audio');
+                audio.pause();
+                audio.src = '';
+            } else if (currentSongIndex >= musicConfig.songs.length) {
+                playSong(0);
+            }
             showToast("Song removed.", "info");
+        }
+
+        function saveMusicConfig() {
+            localStorage.setItem('hub_music', JSON.stringify(musicConfig));
+        }
+
+        function playSong(index) {
+            if (!musicConfig.songs || musicConfig.songs.length === 0) return;
+            currentSongIndex = index;
+            const song = musicConfig.songs[index];
+            const audio = document.getElementById('bg-audio');
+            audio.src = song.url;
+            audio.volume = (musicConfig.volume || 70) / 100;
+            document.getElementById('now-playing-title-2').innerText = song.title || "Now Playing";
+            audio.play().catch(() => showToast("Click again — browsers block auto-play.", "error"));
+            updatePlayIcon(true);
+        }
+
+        function toggleShuffleMode() {
+            musicConfig.shuffle = !musicConfig.shuffle;
+            saveMusicConfig();
+            document.getElementById('shuffle-status').innerText = musicConfig.shuffle ? 'On' : 'Off';
+            showToast("Shuffle " + (musicConfig.shuffle ? "enabled" : "disabled"), "info");
+        }
+
+        function shuffleMusic() {
+            if (!musicConfig.songs || musicConfig.songs.length === 0) return;
+            let nextIndex;
+            if (musicConfig.shuffle && musicConfig.songs.length > 1) {
+                do { nextIndex = Math.floor(Math.random() * musicConfig.songs.length); }
+                while (nextIndex === currentSongIndex);
+            } else {
+                nextIndex = (currentSongIndex + 1) % musicConfig.songs.length;
+            }
+            playSong(nextIndex);
+        }
+
+        function nextSong() {
+            if (!musicConfig.songs || musicConfig.songs.length === 0) return;
+            const nextIndex = (currentSongIndex + 1) % musicConfig.songs.length;
+            playSong(nextIndex);
         }
 
         function togglePlayMusic() {
             const audio = document.getElementById('bg-audio');
+            if (!audio.src) {
+                if (musicConfig.songs && musicConfig.songs.length > 0) playSong(0);
+                return;
+            }
             if (audio.paused) {
                 audio.play().catch(() => showToast("Click again — browsers block auto-play.", "error"));
                 updatePlayIcon(true);
@@ -1086,29 +1213,41 @@
             }
         }
 
-        function stopMusic() {
-            const audio = document.getElementById('bg-audio');
-            audio.pause();
-            audio.currentTime = 0;
-            updatePlayIcon(false);
-        }
-
         function updatePlayIcon(playing) {
-            const icon = document.getElementById('play-icon');
-            icon.className = playing ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+            const icon = document.getElementById('play-icon-2');
+            if (icon) icon.className = playing ? 'fa-solid fa-pause' : 'fa-solid fa-play';
         }
 
-        function seekMusic() {
+        function seekMusic(id) {
             const audio = document.getElementById('bg-audio');
-            const seek = document.getElementById('music-seek');
-            if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
+            const seek = document.getElementById('music-seek-2');
+            if (seek && audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
         }
 
-        // Auto-update seek bar
+        function setVolume(id) {
+            const audio = document.getElementById('bg-audio');
+            const vol = document.getElementById('music-volume-2');
+            if (vol) {
+                const v = parseInt(vol.value);
+                audio.volume = v / 100;
+                musicConfig.volume = v;
+                saveMusicConfig();
+            }
+        }
+
+        // Auto-update seek bar + auto-advance to next song
+        const bgAudio = document.getElementById('bg-audio');
+        if (bgAudio) {
+            bgAudio.addEventListener('ended', () => {
+                if (musicConfig.songs && musicConfig.songs.length > 1) {
+                    shuffleMusic();
+                }
+            });
+        }
         setInterval(() => {
             const audio = document.getElementById('bg-audio');
-            const seek = document.getElementById('music-seek');
-            if (audio.duration && !audio.paused) {
+            const seek = document.getElementById('music-seek-2');
+            if (seek && audio.duration && !audio.paused) {
                 seek.value = (audio.currentTime / audio.duration) * 100;
             }
         }, 500);
